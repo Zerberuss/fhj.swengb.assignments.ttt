@@ -272,7 +272,7 @@
                   </GridPane>
                </children>
             </AnchorPane>
-            <AnchorPane fx:id="winPane" layoutX="-22.0" prefHeight="97.0" prefWidth="719.0" styleClass="userinfo" stylesheets="@TicaTacToe.css">
+            <AnchorPane fx:id="winPane" layoutX="-22.0" prefHeight="97.0" prefWidth="719.0" styleClass="userinfo" stylesheets="@TicaTacToe.css" translateX="800.0">
                <children>
                   <Label fx:id="winStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="71.0" layoutY="215.0" prefHeight="183.0" prefWidth="591.0" scaleShape="false" text="PLAYER1 WON THE GAME" textAlignment="CENTER" textFill="#ff8000" textOverrun="CENTER_ELLIPSIS" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
                      <font>
