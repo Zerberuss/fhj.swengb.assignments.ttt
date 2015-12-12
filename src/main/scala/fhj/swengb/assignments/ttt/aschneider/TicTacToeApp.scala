@@ -61,11 +61,16 @@ class TicTacToeApp extends javafx.application.Application {
 //controller contains the description of the functionality of the application
 class TicTacToeAppController extends TicTacToeApp {
   //attributes are being initialized (everything with an ID)
-  @FXML var menu: AnchorPane = _           //Main Pane
-  @FXML var mpMenu: AnchorPane = _         //Settings Pane for Muliplayer
-  @FXML var spMenu: AnchorPane = _         //Settings Pane for SinglePlayer
-  @FXML var gamePane: AnchorPane  = _     //game Pane where the game is played (both mp and sp)
-  @FXML var mpAvatar: ImageView= _           //
+  @FXML var menu: AnchorPane = _
+  //Main Pane
+  @FXML var mpMenu: AnchorPane = _
+  //Settings Pane for Muliplayer
+  @FXML var spMenu: AnchorPane = _
+  //Settings Pane for SinglePlayer
+  @FXML var gamePane: AnchorPane = _
+  //game Pane where the game is played (both mp and sp)
+  @FXML var mpAvatar: ImageView = _
+  //
   @FXML var spAvatar: ImageView = _
 
   @FXML var mpName1: control.TextField = _
@@ -90,10 +95,9 @@ class TicTacToeAppController extends TicTacToeApp {
   @FXML var bottomRight: control.Button = _
 
 
-
-
-  var playingInSpMode: Boolean      = true        //
-  var player1Playing: Boolean       = false
+  var playingInSpMode: Boolean = true
+  //
+  var player1Playing: Boolean = false
 
   /*
   Positions:  0 | 1 | 2
@@ -107,113 +111,118 @@ class TicTacToeAppController extends TicTacToeApp {
   var counter = 1;
 
 
-
   //initialize function executes the commands at startup for the main scene
 
-    def anim(obj: AnchorPane, slideRight: Boolean, xMitte:Int =300, yMitte:Int = 400): Unit = {
+  def anim(obj: AnchorPane, slideRight: Boolean, xMitte: Int = 300, yMitte: Int = 400): Unit = {
 
-      var xEnde = 1200
-      var path: Path = new Path()
+    var xEnde = 1200
+    var path: Path = new Path()
 
-      if (slideRight) {
-        path.getElements.add(new MoveTo(xMitte, yMitte))
-        path.getElements().add(new CubicCurveTo(xMitte + 50, yMitte, xMitte + 200, yMitte, xMitte + xEnde, yMitte))
-      } else {
-        path.getElements.add(new MoveTo(xMitte + xEnde, yMitte))
-        path.getElements().add(new CubicCurveTo(xMitte + 200, yMitte, xMitte + 50, yMitte, xMitte, yMitte))
-      }
-
-      var pathTrans: PathTransition = new PathTransition()
-      pathTrans.setDuration(new Duration(200))
-      pathTrans.setNode(obj)
-      pathTrans.setPath(path)
-      pathTrans.setAutoReverse(false)
-      pathTrans.play()
+    if (slideRight) {
+      path.getElements.add(new MoveTo(xMitte, yMitte))
+      path.getElements().add(new CubicCurveTo(xMitte + 50, yMitte, xMitte + 200, yMitte, xMitte + xEnde, yMitte))
+    } else {
+      path.getElements.add(new MoveTo(xMitte + xEnde, yMitte))
+      path.getElements().add(new CubicCurveTo(xMitte + 200, yMitte, xMitte + 50, yMitte, xMitte, yMitte))
     }
 
-    def startMultiPlayer(playerName1: String, playerName2: String): Boolean ={
+    var pathTrans: PathTransition = new PathTransition()
+    pathTrans.setDuration(new Duration(200))
+    pathTrans.setNode(obj)
+    pathTrans.setPath(path)
+    pathTrans.setAutoReverse(false)
+    pathTrans.play()
+  }
 
-      var player1IsStarting: Boolean = false
-      if(scala.util.Random.nextInt(100)>=50){
-        player1IsStarting=true
-        status.setText("It's " + playerName1 +"'s turn:")
-      }
-      else
-      {
-        player1IsStarting=false
-        status.setText("It's " + playerName2 +"'s turn:")
-      }
-      anim(mpMenu, true,300)
-      anim(gamePane, false,356)
 
-      if(player1IsStarting)
-        return true
-      else
-        return false
+
+
+  def startMultiPlayer(playerName1: String, playerName2: String): Boolean = {
+
+    var player1IsStarting: Boolean = false
+    if (scala.util.Random.nextInt(100) >= 50) {
+      player1IsStarting = true
+      status.setText("It's " + playerName1 + "'s turn:")
+    }
+    else {
+      player1IsStarting = false
+      status.setText("It's " + playerName2 + "'s turn:")
+    }
+    anim(mpMenu, true, 300)
+    anim(gamePane, false, 356)
+
+    if (player1IsStarting)
+      return true
+    else
+      return false
+  }
+
+
+
+  def startSinglePlayer(playerName: String): Boolean = {
+
+    var playerIsStarting: Boolean = false
+    if (scala.util.Random.nextInt(100) >= 50) {
+      playerIsStarting = true
+      status.setText("It's " + playerName + "'s turn:")
+    }
+    else {
+      playerIsStarting = false
+      status.setText("It's " + "computers" + "'s turn:")
     }
 
-    def startSinglePlayer(playerName: String): Boolean ={
+    anim(spMenu, true, 300)
+    anim(gamePane, false, 356)
+    if (playerIsStarting)
+      return true
+    else
+      return false
+  }
 
-      var playerIsStarting: Boolean = false
-      if(scala.util.Random.nextInt(100)>=50){
-        playerIsStarting=true
-        status.setText("It's " + playerName +"'s turn:")
-      }
-      else
-      {
-        playerIsStarting=false
-        status.setText("It's " + "computers" +"'s turn:")
-      }
 
-      anim(spMenu, true,300)
-      anim(gamePane, false,356)
-      if(playerIsStarting)
-        return true
-      else
-        return false
-   }
 
-  def drawPlayGround(playerSymbol: Char, markedPos: Int): Unit ={
-    if(markedPos == 0){
+
+  def drawPlayGround(playerSymbol: Char, markedPos: Int): Unit = {
+    if (markedPos == 0) {
       topLeft.setText(playerSymbol.toString)
       topLeft.setDisable(true)
     }
-    else if(markedPos == 1){
+    else if (markedPos == 1) {
       topCentre.setText(playerSymbol.toString)
       topCentre.setDisable(true)
     }
-    else if(markedPos == 2){
+    else if (markedPos == 2) {
       topRight.setText(playerSymbol.toString)
       topRight.setDisable(true)
     }
-    else if(markedPos == 3){
+    else if (markedPos == 3) {
       centreLeft.setText(playerSymbol.toString)
       centreLeft.setDisable(true)
     }
-    else if(markedPos == 4){
+    else if (markedPos == 4) {
       centreCentre.setText(playerSymbol.toString)
       centreCentre.setDisable(true)
     }
-    else if(markedPos == 5){
+    else if (markedPos == 5) {
       centreRight.setText(playerSymbol.toString)
       centreRight.setDisable(true)
     }
-    else if(markedPos == 6){
+    else if (markedPos == 6) {
       bottomLeft.setText(playerSymbol.toString)
       bottomLeft.setDisable(true)
     }
-    else if(markedPos == 7){
+    else if (markedPos == 7) {
       bottomCentre.setText(playerSymbol.toString)
       bottomCentre.setDisable(true)
     }
-    else{
+    else {
       bottomRight.setText(playerSymbol.toString)
       bottomRight.setDisable(true)
     }
   }
 
 
-  def checkForWinner(board: Array[Char], symbol:Char): Boolean ={
+  def checkForWinner(board: Array[Char], symbol: Char): Boolean = {
 
     val winBoard =
       List(
@@ -226,82 +235,125 @@ class TicTacToeAppController extends TicTacToeApp {
         List(0, 4, 8),
         List(2, 4, 6))
 
-        print("\ncounter: " + counter)//== symbol)
+    print("\ncounter: " + counter) //== symbol)
 
-        return winBoard.exists(winSet => winSet.forall(board(_)==symbol))
+    return winBoard.exists(winSet => winSet.forall(board(_) == symbol))
 
-    }
+  }
 
 
   /*
       player: current playing player (is Player 1 playing?)
       gameMode: playing in Sp-Mode?
-
+      markedPos: position played
+      board: last state of the board
    */
-    def mainGame(player: Boolean, gameMode:Boolean, markedPos: Int, board: Array[Char]): Unit ={
+  def mainGame(player: Boolean, computerEnemy: Boolean, markedPos: Int, board: Array[Char]): Unit = {
 
     val symbol1 = 'X'
     val symbol2 = 'O'
     var symbol = '?'
-    if(player) symbol = symbol1
+    if (player) symbol = symbol1
     else symbol = symbol2
 
-    board(markedPos)=symbol
+    board(markedPos) = symbol
 
     status.setText("Drawing...")
-    drawPlayGround(symbol,markedPos)
+    drawPlayGround(symbol, markedPos)
 
-    if(checkForWinner(board, symbol)){
-        print("WE HAVE A WINNER\n")
+    if (checkForWinner(board, symbol)) {
+      print("WE HAVE A WINNER\n")
 
-      if(player) winStatus.setText(mpName1.getCharacters.toString + " won the game in " + counter + " steps!")
+      if (player) winStatus.setText(mpName1.getCharacters.toString + " won the game in " + counter + " steps!")
       else winStatus.setText(mpName2.getCharacters.toString + " won the game in " + counter + " steps!")
 
-        playground.setDisable(true)
-        anim(winPane,false,370, 130)
+      playground.setDisable(true)
+      anim(winPane, false, 370, 130)
 
     }
 
 
-    if(gameMode) {
+    if (computerEnemy) {
       status.setText("Computer is thinking...")
+      if (symbol == symbol1) symbol = symbol2 else symbol = symbol2
+      /*do{
 
+      }while(board())*/
+      //drawPlayGround(symbol,markedPos)
 
 
     }
     else {
-      if(!player) status.setText("It's " + mpName1.getCharacters.toString +"'s (" + symbol1 + ") turn:" )
-      else status.setText("It's " + mpName2.getCharacters.toString + "'s (" + symbol2 + ") turn:" )
+      if (!player) status.setText("It's " + mpName1.getCharacters.toString + "'s (" + symbol1 + ") turn:")
+      else status.setText("It's " + mpName2.getCharacters.toString + "'s (" + symbol2 + ") turn:")
 
 
       player1Playing = !player
-      counter +=1
+      counter += 1
     }
-    }
+  }
 
 
-    def mpMenuBack(): Unit = anim(mpMenu, true)
-    //Hier die richtigen User Infos übergeben! -> aus tabelle oda ka wie ihr sie gespeichert habts
-    def spMenuBack(): Unit = anim(spMenu, true)
-    def mpStartMenu(): Unit = anim(mpMenu, false);
-    def spStartMenu(): Unit = anim(spMenu, false)
+  def mpMenuBack(): Unit = anim(mpMenu, true)
 
-    def mpStart(): Unit = {playingInSpMode=false; player1Playing=startMultiPlayer(mpName1.getCharacters.toString, mpName2.getCharacters.toString)}
-    def spStart(): Unit = {playingInSpMode=true; player1Playing=startSinglePlayer(spName.getCharacters.toString)}
+  //Hier die richtigen User Infos übergeben! -> aus tabelle oda ka wie ihr sie gespeichert habts
+  def spMenuBack(): Unit = anim(spMenu, true)
 
-    def backToMainMenu(): Unit = ???
+  def mpStartMenu(): Unit = anim(mpMenu, false);
 
-    def restart(): Unit = {menu.getScene().getWindow().hide() ; start(new Stage); counter = 0} //board.foreach(_='?')
-    def playTopLeft(): Unit =  {mainGame(player1Playing, playingInSpMode, 0, board)}
-    def playTopCentre(): Unit =  {mainGame(player1Playing, playingInSpMode, 1, board)}
-    def playTopRight(): Unit =  {mainGame(player1Playing, playingInSpMode, 2, board)}
-    def playCentreLeft(): Unit = {mainGame(player1Playing, playingInSpMode, 3, board)}
-    def playCentreCentre(): Unit = {mainGame(player1Playing, playingInSpMode, 4, board)}
-    def playCentreRight(): Unit =  {mainGame(player1Playing, playingInSpMode, 5, board)}
-    def playBottomLeft(): Unit =  {mainGame(player1Playing, playingInSpMode, 6, board)}
-    def playBottomCentre(): Unit =  {mainGame(player1Playing, playingInSpMode, 7, board)}
-    def playBottomRight(): Unit =  {mainGame(player1Playing, playingInSpMode, 8, board)}
+  def spStartMenu(): Unit = anim(spMenu, false)
 
-    def exit(): Unit = System.exit(1)
+  def mpStart(): Unit = {
+    playingInSpMode = false; player1Playing = startMultiPlayer(mpName1.getCharacters.toString, mpName2.getCharacters.toString)
+  }
+
+  def spStart(): Unit = {
+    playingInSpMode = true; player1Playing = startSinglePlayer(spName.getCharacters.toString)
+  }
+
+  def backToMainMenu(): Unit = ???
+
+  def restart(): Unit = {
+    menu.getScene().getWindow().hide(); start(new Stage); counter = 0
+  }
+
+
+  def playTopLeft(): Unit = {
+    mainGame(player1Playing, playingInSpMode, 0, board)
+  }
+
+  def playTopCentre(): Unit = {
+    mainGame(player1Playing, playingInSpMode, 1, board)
+  }
+
+  def playTopRight(): Unit = {
+    mainGame(player1Playing, playingInSpMode, 2, board)
+  }
+
+  def playCentreLeft(): Unit = {
+    mainGame(player1Playing, playingInSpMode, 3, board)
+  }
+
+  def playCentreCentre(): Unit = {
+    mainGame(player1Playing, playingInSpMode, 4, board)
+  }
+
+  def playCentreRight(): Unit = {
+    mainGame(player1Playing, playingInSpMode, 5, board)
+  }
+
+  def playBottomLeft(): Unit = {
+    mainGame(player1Playing, playingInSpMode, 6, board)
+  }
+
+  def playBottomCentre(): Unit = {
+    mainGame(player1Playing, playingInSpMode, 7, board)
+  }
+
+  def playBottomRight(): Unit = {
+    mainGame(player1Playing, playingInSpMode, 8, board)
+  }
+
+  def exit(): Unit = System.exit(1)
 
 }
