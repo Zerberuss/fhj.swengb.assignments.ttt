@@ -314,7 +314,8 @@ class TicTacToeAppController extends TicTacToeApp {
   def backToMainMenu(): Unit = ???
 
   def restart(): Unit = {
-    menu.getScene().getWindow().hide(); start(new Stage); counter = 0
+    TicTacToe.apply()
+    //menu.getScene().getWindow().hide(); start(new Stage); counter = 0
   }
 
 
