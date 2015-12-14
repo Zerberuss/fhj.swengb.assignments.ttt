@@ -87,7 +87,7 @@ object TicTacToe {
     }
     temp
   }
-  /*
+/*
   def play(t: TicTacToe, moves: Seq[TMove]): TicTacToe = {
     var temp:TicTacToe = t;
     //determining the current player
@@ -118,7 +118,7 @@ object TicTacToe {
     temp
 
   }
-  */
+*/
 
   /**
     * creates all possible games.
@@ -168,6 +168,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     *
     * @return
     */
+
   def asString(): String = {
     var board: String =
       "|---|---|---|\n" +
@@ -203,7 +204,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     * The game is over if either of a player wins or there is a draw.
     */
   val gameOver: Boolean = {
-    if (moveHistory.size >= 9 || winner!=None) {
+    if (moveHistory.size >= 9 || winner.isDefined) {
       true
     } else {
       false
@@ -212,33 +213,17 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
   }
 
 
-
-
-
   /**
     * the moves which are still to be played on this tic tac toe.
     */
   val remainingMoves: Set[TMove] = {
-    //val allMoves = Seq[TMove](TopLeft, TopCenter,  TopRight, MiddleCenter, MiddleLeft, MiddleRight, BottomCenter,BottomLeft,BottomRight)
-    //allMoves.filter(!madeMoves.contains(_)).toSet
-    //(allMoves filterNot madeMoves.contains).toSet
-    //allMoves.diff(madeMoves).toSet
-    allMoves.filter(!moveHistory.map(_._1).toSet.contains(_)).toSet
 
-  }
-
-  def remainingMovesSimulated(executedMoves: Map[TMove, Player]): Set[TMove] = {
-    //val allMoves = Seq[TMove](TopLeft, TopCenter,  TopRight, MiddleCenter, MiddleLeft, MiddleRight, BottomCenter,BottomLeft,BottomRight)
-    //allMoves.filter(!madeMoves.contains(_)).toSet
-    (allMoves filterNot executedMoves.map(_._1).toSet.contains).toSet
-    //allMoves.diff(madeMoves).toSet
-
+    allMoves.filter(!moveHistory.keySet.contains(_)).toSet
 
   }
 
 
-
-  /*
+    /*
   def returnCaseObject(index:Int):TMove = {
     //allMoves.filter(_.idx == index).head
     if (index >= 0 && index < allMoves.size) {
@@ -254,7 +239,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     allMoves.find(_.idx == index).get //find returns an option, so we get the value out of the option
   }
 
-  def returnCaseObject2(index:Int):TMove = {
+  def returnCaseObjectMove(index:Int):TMove = {
     allMoves.filter(_.idx == index).head
   }
 
@@ -266,51 +251,86 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
   //lazy val nextGames: Set[TicTacToe] = Set(TicTacToe(moveHistory: Map[TMove, Player],
   //                   nextPlayer: Player = PlayerA));
 
-  /**
-    * Either there is no winner, or PlayerA or PlayerB won the game.
-    *
-    * The set of moves contains all moves which contributed to the result.
-    */
-
 
   def checkIfWon(moves:Set[TMove]):Boolean = {
-    if(checkIfPlayerAorBWon(moves) == 'N')  false
-    else  true
-  }
-
-   def checkIfPlayerAorBWon(moves:Set[TMove]):Char = {
-     0 -> 16, 1 -> 20, 2 -> 24,
-     3 -> 44, 4 -> 48, 5 -> 52,
-     6 -> 72, 7 -> 76, 8 -> 80)
-     val winBoard = List(
-                         List(TopLeft, TopCenter, TopRight),
+     val winBoard = List(List(TopLeft, TopCenter, TopRight),
                          List(MiddleLeft, MiddleCenter, MiddleRight),
                          List(BottomLeft, BottomCenter, BottomRight),
                          List(TopLeft, MiddleLeft, BottomLeft),
                          List(TopCenter, MiddleCenter, BottomCenter),
                          List(TopRight, MiddleRight, BottomRight),
                          List(TopLeft, MiddleCenter, BottomRight),
-                         List(TopRight, MiddleCenter, TopRight)
-       )
+                         List(TopRight, MiddleCenter, TopRight))
 
-     /*val winBoard =List(
-         List(16, 20, 24),
-         List(44, 48, 52),
-         List(72, 76, 80),
-         List(16, 44, 72),
-         List(20, 48, 76),
-         List(24, 52, 80),
-         List(16, 48, 80),
-         List(24, 48, 72))
-         */
-     if(winBoard.exists(winSet => winSet.forall( moves.contains(_) )))  'A'
-     else if(winBoard.exists(winSet => winSet.forall( asString().charAt(_) == 'o'))) 'B'
-
-
-     if(winBoard.exists(winSet => winSet.forall( asString().charAt(_) == 'x')))  'A'
-     else if(winBoard.exists(winSet => winSet.forall( asString().charAt(_) == 'o'))) 'B'
-     else  'N'
+     if(winBoard.exists(winSet => winSet.forall( moves.contains(_) ))) true
+     else  false
    }
+
+
+  /**
+    * Either there is no winner, or PlayerA or PlayerB won the game.
+    *
+    * The set of moves contains all moves which contributed to the result.
+    */
+  def winner: Option[(Player, Set[TMove])] = {
+    //filter value after the player and then only return the keys (executed moves) as a Set of [TMove]
+    //val movesPlayerB = moveHistory.filter(_ == PlayerA).map(_._1).toSet
+
+    val movesPlayerA = moveHistory.filter(_ == PlayerA).keySet
+    val movesPlayerB = moveHistory.filter(_ == PlayerB).keySet
+
+    if (checkIfWon(movesPlayerA)) {
+      Some(PlayerA, movesPlayerA)
+    } else if (checkIfWon(movesPlayerB)) {
+      Some(PlayerB, movesPlayerB)
+    } else None
+
+  }
+
+
+
+  /**
+    * returns a copy of the current game, but with the move applied to the tic tac toe game.
+    *
+    * @param move   to be played
+    * @param player the player
+    * @return
+    */
+  def turn(move: TMove, player: Player): TicTacToe = {
+
+    if (!moveHistory.keySet.contains(move)) {
+      if (player == PlayerA) {
+        TicTacToe(moveHistory + (move -> player), PlayerB)
+      } else {
+        TicTacToe(moveHistory + (move -> player), PlayerA)
+      }
+
+    }
+    else {
+      TicTacToe(moveHistory, player)
+    }
+
+  }
+
+
+
+  /**
+
+  CPU PLAYER CODE
+
+  NMINMAX ALGORITHM USED
+  src1: http://www3.ntu.edu.sg/home/ehchua/programming/java/javagame_tictactoe_ai.html
+  src2: http://letstalkdata.com/2015/01/implementing-minimax-in-scala-naive-minimax/
+    */
+
+  def remainingMovesSimulated(executedMoves: Map[TMove, Player]): Set[TMove] = {
+    //val allMoves = Seq[TMove](TopLeft, TopCenter,  TopRight, MiddleCenter, MiddleLeft, MiddleRight, BottomCenter,BottomLeft,BottomRight)
+    //allMoves.filter(!madeMoves.contains(_)).toSet
+    (allMoves filterNot executedMoves.keySet.contains).toSet
+    //allMoves.diff(madeMoves).toSet
+
+
+  }
 
 
   //simple algorithm that returns the TMove that would cause a win for the enemy in the shortest time:
@@ -332,8 +352,8 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
   //private def minimize(moveHistorySimulated:Map[TMove, Player],depth:Int):Int = {
   private def minimize(moveHistorySimulated:Map[TMove, Player]):Int = {
-    val remainingMovesCurrent = remainingMovesSimulated(moveHistorySimulated);
-    if(winnerSimulate(moveHistorySimulated)!=None || remainingMovesCurrent.size == 0) return evaluate(moveHistorySimulated)
+    val remainingMovesCurrent = remainingMovesSimulated(moveHistorySimulated)
+    if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty) return evaluate(moveHistorySimulated)
     var bestResult = Integer.MAX_VALUE
     remainingMovesCurrent.foreach(move => {
       val bestChildResult = maximize(turnSimulated(moveHistorySimulated,move,PlayerA))  //check what player should be maximized and what minimized
@@ -344,8 +364,8 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
   //private def maximize(moveHistorySimulated:Map[TMove, Player],depth:Int):Int = {
   private def maximize(moveHistorySimulated:Map[TMove, Player]):Int = {
-    val remainingMovesCurrent = remainingMovesSimulated(moveHistorySimulated);
-    if(winnerSimulate(moveHistorySimulated)!=None || remainingMovesCurrent.size == 0) return evaluate(moveHistorySimulated)
+    val remainingMovesCurrent = remainingMovesSimulated(moveHistorySimulated)
+    if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty) return evaluate(moveHistorySimulated)
     var bestResult = Integer.MIN_VALUE
     remainingMovesCurrent.foreach(move => {
       val bestChildResult = minimize(turnSimulated(moveHistorySimulated,move,PlayerB))
@@ -355,47 +375,27 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
   }
 
 
-  def winner: Option[(Player, Set[TMove])] = {
 
-    //None
-    //Some(PlayerA, Set(MiddleCenter))
-    //Some(PlayerA, Set(MiddleCenter))
-    //filter value after the player and then only return the keys (executed moves) as a Set of [TMove]
-    val movesPlayerA = moveHistory.filter(_ == PlayerA).map(_._1).toSet;
-    val movesPlayerB = moveHistory.filter(_ == PlayerB).map(_._1).toSet;
-    /*
-    if (checkIfWon(movesPlayerA)) {
-      Some(PlayerA, movesPlayerA)
-    } else if (checkIfWon(movesPlayerB)) {
-      Some(PlayerB, movesPlayerB)
-    } else {None}
-    */
-    if (checkIfPlayerAorBWon(moveHistory.map(_._1).toSet)==PlayerA) {
-      Some(PlayerA, movesPlayerA)
-    } else if (checkIfWon(movesPlayerB)) {
-      Some(PlayerB, movesPlayerB)
-    } else {None}
-  }
 
   def winnerSimulate(moveHis:Map[TMove, Player]): Option[(Player, Set[TMove])] = {
-    val movesPlayerA = moveHis.filter(_ == PlayerA).map(_._1).toSet;
-    val movesPlayerB = moveHis.filter(_ == PlayerB).map(_._1).toSet;
+    val movesPlayerA = moveHis.filter(_ == PlayerA).keySet
+    val movesPlayerB = moveHis.filter(_ == PlayerB).keySet
     if (checkIfWon(movesPlayerA)) {
       Some(PlayerA, movesPlayerA)
     } else if (checkIfWon(movesPlayerB)) {
       Some(PlayerB, movesPlayerB)
-    } else {None}
-    */
+    } else None
+
   }
 
   def winnerScore(moveHis:Map[TMove, Player]): Int = {
-    val movesPlayerA = moveHis.filter(_ == PlayerA).map(_._1).toSet;
-    val movesPlayerB = moveHis.filter(_ == PlayerB).map(_._1).toSet;
+    val movesPlayerA = moveHis.filter(_ == PlayerA).keySet
+    val movesPlayerB = moveHis.filter(_ == PlayerB).keySet
     if (checkIfWon(movesPlayerA)) {
       1
     } else if (checkIfWon(movesPlayerB)) {
       -1
-    } else {0}
+    } else 0
 
   }
 
@@ -404,8 +404,8 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     * src: http://www3.ntu.edu.sg/home/ehchua/programming/java/javagame_tictactoe_ai.html
     */
   def evaluate(moveHis:Map[TMove, Player]):Int = {
-    val movesPlayerA = moveHis.filter(_ == PlayerA).map(_._1).toSet;  //executedMoves of Player A
-    val movesPlayerB = moveHis.filter(_ == PlayerB).map(_._1).toSet;  //executedMoves of Player B
+    val movesPlayerA = moveHis.filter(_ == PlayerA).keySet;  //executedMoves of Player A
+    val movesPlayerB = moveHis.filter(_ == PlayerB).keySet;  //executedMoves of Player B
 
     var scoreG = 0;
 
@@ -476,28 +476,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
   }
 
 
-  /**
-    * returns a copy of the current game, but with the move applied to the tic tac toe game.
-    *
-    * @param move   to be played
-    * @param player the player
-    * @return
-    */
-  def turn(p: TMove, player: Player): TicTacToe = {
 
-    if (!moveHistory.keySet.contains(p)) {
-      if (player == PlayerA) {
-        TicTacToe((moveHistory + (p -> player)), PlayerB)
-      } else {
-        TicTacToe((moveHistory + (p -> player)), PlayerA)
-      }
-
-    }
-    else {
-      TicTacToe(moveHistory, player)
-    }
-
-  }
 
   def turnSimulated(moveHis:Map[TMove, Player], p: TMove, player: Player):Map[TMove, Player] = {
     moveHis + (p -> player)

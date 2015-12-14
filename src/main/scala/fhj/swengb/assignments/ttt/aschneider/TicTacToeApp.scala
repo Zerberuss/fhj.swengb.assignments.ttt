@@ -304,6 +304,8 @@ class TicTacToeAppController extends TicTacToeApp {
   def spStartMenu(): Unit = anim(spMenu, false)
 
   def mpStart(): Unit = {
+
+
     playingInSpMode = false; player1Playing = startMultiPlayer(mpName1.getCharacters.toString, mpName2.getCharacters.toString)
   }
 
@@ -320,7 +322,8 @@ class TicTacToeAppController extends TicTacToeApp {
 
 
   def playTopLeft(): Unit = {
-    mainGame(player1Playing, playingInSpMode, 0, board)
+    turn(TopLeft)
+    //mainGame(player1Playing, playingInSpMode, 0, board)
   }
 
   def playTopCentre(): Unit = {
