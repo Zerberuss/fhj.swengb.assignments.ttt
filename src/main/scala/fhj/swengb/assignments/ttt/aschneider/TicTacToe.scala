@@ -152,8 +152,8 @@ object TicTacToe {
 case class TicTacToe(moveHistory: Map[TMove, Player],
                      nextPlayer: Player = PlayerA) {
 
-  val madeMoves = Seq[TMove](MiddleCenter, BottomCenter)
-  val allMoves = Seq[TMove](TopLeft, TopCenter,  TopRight, MiddleCenter, MiddleLeft, MiddleRight, BottomCenter,BottomLeft,BottomRight)
+  val madeMoves = Seq[TMove]()
+  val allMoves = Seq[TMove](TopLeft, TopCenter,  TopRight,MiddleLeft, MiddleCenter, MiddleRight,BottomLeft, BottomCenter,BottomRight)
 
   /**
     * outputs a representation of the tic tac toe like this:
@@ -169,10 +169,6 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     * @return
     */
   def asString(): String = {
-    val indexMap = Map(0 -> 16, 1 -> 20, 2 -> 24,
-      3 -> 44, 4 -> 48, 5 -> 52,
-      6 -> 72, 7 -> 76, 8 -> 80)
-
     var board: String =
       "|---|---|---|\n" +
         "|   |   |   |\n" +
@@ -182,16 +178,19 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
         "|   |   |   |\n" +
         "|---|---|---|\n"
 
+    val boardMap = Map( 0 -> 16, 1 -> 20, 2 -> 24,
+                        3 -> 44, 4 -> 48, 5 -> 52,
+                        6 -> 72, 7 -> 76, 8 -> 80)
 
-    for ((k, v) <- moveHistory) {
-      if (v == PlayerA) {
-        board = board.updated(indexMap(k.idx), "o").mkString
+    for ((x, p) <- moveHistory) {
+      if (p == PlayerA) {
+        board = board.updated(boardMap(x.idx), "o").mkString
       }
-      else if (v == PlayerB) {
-        board = board.updated(indexMap(k.idx), "x").mkString
+      else if (p == PlayerB) {
+        board = board.updated(boardMap(x.idx), "x").mkString
       }
       else {
-        board = board.updated(indexMap(k.idx), " ").mkString
+        board = board.updated(boardMap(x.idx), " ").mkString
       }
     }
     board
@@ -273,18 +272,46 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     * The set of moves contains all moves which contributed to the result.
     */
 
+
   def checkIfWon(moves:Set[TMove]):Boolean = {
-
-    if((Set(TopLeft, TopCenter, TopRight).filter(x => moves.contains(x)).size==0) ||
-      (Set(MiddleLeft, MiddleCenter, MiddleRight).filter(x => moves.contains(x)).size==0) ||
-      (Set(BottomLeft, BottomCenter, BottomRight).filter(x => moves.contains(x)).size==0) ||
-      (Set(TopLeft, MiddleLeft, BottomLeft).filter(x => moves.contains(x)).size==0) ||
-      (Set(TopCenter, MiddleCenter, BottomCenter).filter(x => moves.contains(x)).size==0) ||
-      (Set(TopRight, MiddleRight, BottomRight).filter(x => moves.contains(x)).size==0) ||
-      (Set(TopLeft, MiddleCenter, BottomRight).filter(x => moves.contains(x)).size==0) ||
-      (Set(TopRight, MiddleCenter, TopRight).filter(x => moves.contains(x)).size==0)) {true } else {false}
-
+    if(checkIfPlayerAorBWon(moves) == 'N')  false
+    else  true
   }
+
+   def checkIfPlayerAorBWon(moves:Set[TMove]):Char = {
+     0 -> 16, 1 -> 20, 2 -> 24,
+     3 -> 44, 4 -> 48, 5 -> 52,
+     6 -> 72, 7 -> 76, 8 -> 80)
+     val winBoard = List(
+                         List(TopLeft, TopCenter, TopRight),
+                         List(MiddleLeft, MiddleCenter, MiddleRight),
+                         List(BottomLeft, BottomCenter, BottomRight),
+                         List(TopLeft, MiddleLeft, BottomLeft),
+                         List(TopCenter, MiddleCenter, BottomCenter),
+                         List(TopRight, MiddleRight, BottomRight),
+                         List(TopLeft, MiddleCenter, BottomRight),
+                         List(TopRight, MiddleCenter, TopRight)
+       )
+
+     /*val winBoard =List(
+         List(16, 20, 24),
+         List(44, 48, 52),
+         List(72, 76, 80),
+         List(16, 44, 72),
+         List(20, 48, 76),
+         List(24, 52, 80),
+         List(16, 48, 80),
+         List(24, 48, 72))
+         */
+     if(winBoard.exists(winSet => winSet.forall( moves.contains(_) )))  'A'
+     else if(winBoard.exists(winSet => winSet.forall( asString().charAt(_) == 'o'))) 'B'
+
+
+     if(winBoard.exists(winSet => winSet.forall( asString().charAt(_) == 'x')))  'A'
+     else if(winBoard.exists(winSet => winSet.forall( asString().charAt(_) == 'o'))) 'B'
+     else  'N'
+   }
+
 
   //simple algorithm that returns the TMove that would cause a win for the enemy in the shortest time:
   private def playSimulated():(TMove) = {
@@ -336,12 +363,18 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     //filter value after the player and then only return the keys (executed moves) as a Set of [TMove]
     val movesPlayerA = moveHistory.filter(_ == PlayerA).map(_._1).toSet;
     val movesPlayerB = moveHistory.filter(_ == PlayerB).map(_._1).toSet;
+    /*
     if (checkIfWon(movesPlayerA)) {
       Some(PlayerA, movesPlayerA)
     } else if (checkIfWon(movesPlayerB)) {
       Some(PlayerB, movesPlayerB)
     } else {None}
-
+    */
+    if (checkIfPlayerAorBWon(moveHistory.map(_._1).toSet)==PlayerA) {
+      Some(PlayerA, movesPlayerA)
+    } else if (checkIfWon(movesPlayerB)) {
+      Some(PlayerB, movesPlayerB)
+    } else {None}
   }
 
   def winnerSimulate(moveHis:Map[TMove, Player]): Option[(Player, Set[TMove])] = {
@@ -352,7 +385,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     } else if (checkIfWon(movesPlayerB)) {
       Some(PlayerB, movesPlayerB)
     } else {None}
-
+    */
   }
 
   def winnerScore(moveHis:Map[TMove, Player]): Int = {
