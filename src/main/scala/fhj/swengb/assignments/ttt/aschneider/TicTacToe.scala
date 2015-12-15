@@ -290,7 +290,8 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
   }
 
 
-
+  val enemyPlayer:Player = PlayerB;
+  val humanPlayer:Player = PlayerA;
 
 
   def makeMove():(TMove) = {
@@ -298,18 +299,60 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
       case PlayerA => PlayerB;
       case PlayerB => PlayerA;
     }
-    minimax3(moveHistory,currentPlayer,nextPlayer,3)._1;
+    minimax3(moveHistory,currentPlayer,nextPlayer,9)._1;
 
   }
 
 
   /** Recursive minimax at level of depth for either maximizing or minimizing player.
        Return int[3] of {score, row, col}  */
+  /*
+   private def minimax3(moveHistorySimulated:Map[TMove, Player],player:Player, nexPlayer:Player,depth:Int):Tuple2[TMove, Int] = {
+      // Generate possible next moves in a List of int[2] of {row, col}.
+      val nextMoves = remainingMovesSimulated(moveHistorySimulated)
+
+      var bestScore:Int = if(player == nextPlayer) {Integer.MAX_VALUE} else {Integer.MIN_VALUE}
+      // mySeed is maximizing; while oppSeed is minimizing
+      var currentScore:Int = 0;
+      var bestMove:TMove = MiddleCenter;
+      //int bestRow = -1;
+      //int bestCol = -1;
+
+      if(winnerSimulate(moveHistorySimulated).isDefined || nextMoves.isEmpty || depth == 0) {
+         // Gameover or depth reached, evaluate score
+         //bestScore = evaluate(moveHistorySimulated, player, nextPlayer)
+        bestScore = evaluate(moveHistorySimulated, player, nextPlayer)
+      } else {
+
+         for (move <- nextMoves) {
+            // Try this move for the current "player"
+            //cells[move[0]][move[1]].content = player;
+            if (player != nextPlayer) {  // mySeed (computer) is maximizing player
+               currentScore = minimax3(moveHistorySimulated + (move -> player),nexPlayer, player, depth - 1)._2;
+               if (currentScore > bestScore) {
+                  bestScore = currentScore;
+                  bestMove = move;
+               }
+            } else {  // oppSeed is minimizing player
+               currentScore = minimax3(moveHistorySimulated + (move -> player),nexPlayer, player, depth - 1)._2;
+               if (currentScore < bestScore) {
+                  bestScore = currentScore;
+                  bestMove = move;
+               }
+            }
+            // Undo move
+            //cells[move[0]][move[1]].content = Seed.EMPTY;
+         }
+      }
+      new Tuple2[TMove, Int](bestMove, bestScore);
+   }
+  */
+
   private def minimax3(moveHistorySimulated:Map[TMove, Player],player:Player, nexPlayer:Player,depth:Int):Tuple2[TMove, Int] = {
     // Generate possible next moves in a List of int[2] of {row, col}.
     val nextMoves = remainingMovesSimulated(moveHistorySimulated)
 
-    var bestScore:Int = if(player == nextPlayer) {Integer.MAX_VALUE} else {Integer.MIN_VALUE}
+    var bestScore:Int = if(player == enemyPlayer) {Integer.MIN_VALUE} else {Integer.MAX_VALUE}
     // mySeed is maximizing; while oppSeed is minimizing
     var currentScore:Int = 0;
     var bestMove:TMove = MiddleCenter;
@@ -318,13 +361,14 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
     if(winnerSimulate(moveHistorySimulated).isDefined || nextMoves.isEmpty || depth == 0) {
       // Gameover or depth reached, evaluate score
-      bestScore = evaluate(moveHistorySimulated, player, nextPlayer)
+      //bestScore = evaluate(moveHistorySimulated, player, nextPlayer)
+      bestScore = evaluate(moveHistorySimulated, enemyPlayer, humanPlayer)
     } else {
 
       for (move <- nextMoves) {
         // Try this move for the current "player"
         //cells[move[0]][move[1]].content = player;
-        if (player != nextPlayer) {  // mySeed (computer) is maximizing player
+        if (player == enemyPlayer) {  // mySeed (computer) is maximizing player
           currentScore = minimax3(moveHistorySimulated + (move -> player),nexPlayer, player, depth - 1)._2;
           if (currentScore > bestScore) {
             bestScore = currentScore;
@@ -343,7 +387,6 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     }
     new Tuple2[TMove, Int](bestMove, bestScore);
   }
-
 
   //simple algorithm that returns the TMove that would cause a win for the enemy in the shortest time:
   def playSimulated():(TMove) = {
@@ -396,7 +439,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
 
   private def minimax(curPlayer: Player, nexPlayer: Player):Int = {
-    val maxDepth = 3;
+    val maxDepth = 9;
     //val moveHis:Map[TMove, Player] = moveHistory;
     //minimize(moveHistory,maxDepth) //maxDepth limitation is not necessary here because we have 9 turns at max. so in terms of performance this should not be a problem
     //private def minimize(moveHistorySimulated:Map[TMove, Player],depth:Int):Int = {
@@ -470,6 +513,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
   /**
     * src: http://www3.ntu.edu.sg/home/ehchua/programming/java/javagame_tictactoe_ai.html
     */
+  //playerCurrent should be the computer, playerNext should be human
   def evaluate(moveHis:Map[TMove, Player], playerCurrent:Player, playerNext:Player):Int = {
     val movesPlayerA = moveHis.filter(_._2 == playerCurrent).keySet;  //executedMoves of Player A
     val movesPlayerB = moveHis.filter(_._2 == playerNext).keySet;  //executedMoves of Player B
