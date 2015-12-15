@@ -157,8 +157,8 @@ class TicTacToeAppController extends TicTacToeApp {
       playerIsStarting = false
     }
     status.setText("Play against the bot:")
-    mpName1.setText(spName.getText())
-    mpName2.setText("Angry Bot")
+    mpName2.setText(spName.getText())
+    mpName1.setText("Angry Bot")
 
     anim(spMenu, true, 300)
     anim(gamePane, false, 356)
@@ -233,9 +233,9 @@ class TicTacToeAppController extends TicTacToeApp {
     if (newGame.gameOver) {
       if (newGame.winner.isDefined) {
         if (newGame.nextPlayer == PlayerA)
-          winStatus.setText(mpName2.getCharacters.toString + " won in " + newGame.moveHistory.size + " steps!")
-        else
           winStatus.setText(mpName1.getCharacters.toString + " won in " + newGame.moveHistory.size + " steps!")
+        else
+          winStatus.setText(mpName2.getCharacters.toString + " won in " + newGame.moveHistory.size + " steps!")
       } else winStatus.setText("There are no turns left!")
 
       playground.setDisable(true)
