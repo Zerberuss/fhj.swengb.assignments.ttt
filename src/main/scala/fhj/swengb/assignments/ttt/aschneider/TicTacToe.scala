@@ -2,7 +2,6 @@ package fhj.swengb.assignments.ttt.aschneider
 
 
 import scala.collection.Set
-import scala.util.Random
 
 /**
   * models the different moves the game allows
@@ -78,8 +77,10 @@ object TicTacToe {
     * @param moves
     * @return
     */
+
+
   def play(t: TicTacToe, moves: Seq[TMove]): TicTacToe = {
-    var temp:TicTacToe = t;
+    var temp:TicTacToe = t
 
     for (move <- moves) {
       temp = temp.turn(move, t.nextPlayer) //the current player is always the nextPlayer of the previous turn
@@ -89,13 +90,13 @@ object TicTacToe {
   }
 /*
   def play(t: TicTacToe, moves: Seq[TMove]): TicTacToe = {
-    var temp:TicTacToe = t;
+    var temp:TicTacToe = t
     //determining the current player
-    var currentPlayer:Player = PlayerA; //if the map is empty, the current player is the human player PlayerA
-    if (temp.moveHistory.size>0){ //if the map is not empty, the currentPlayer is the player that did not make the last move
+    var currentPlayer:Player = PlayerA //if the map is empty, the current player is the human player PlayerA
+    if (temp.moveHistory.nonEmpty){ //if the map is not empty, the currentPlayer is the player that did not make the last move
       currentPlayer = temp.moveHistory.last._2 match {  //match the player of the last turn
-        case PlayerA => PlayerB;
-        case PlayerB => PlayerA;
+        case PlayerA => PlayerB
+        case PlayerB => PlayerA
       }
     }
 
@@ -110,15 +111,16 @@ object TicTacToe {
       //}
 
       currentPlayer = currentPlayer match {
-        case PlayerB => PlayerA;
-        case PlayerA => PlayerB;
+        case PlayerB => PlayerA
+        case PlayerA => PlayerB
       }
     }
 
     temp
 
-  }
-*/
+
+  }*/
+
 
   /**
     * creates all possible games.
@@ -177,7 +179,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
         "|   |   |   |\n" +
         "|---|---|---|\n" +
         "|   |   |   |\n" +
-        "|---|---|---|\n"
+        "|---|---|---|\n\n"
 
     val boardMap = Map( 0 -> 16, 1 -> 20, 2 -> 24,
                         3 -> 44, 4 -> 48, 5 -> 52,
@@ -204,7 +206,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     * The game is over if either of a player wins or there is a draw.
     */
   val gameOver: Boolean = {
-    if (moveHistory.size >= 9 || winner.isDefined) {
+    if (moveHistory.size >= 9 || winner!=None) {
       true
     } else {
       false
@@ -248,23 +250,26 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     * games which can be derived by making the next turn. that means one of the
     * possible turns is taken and added to the set.
     */
-  //lazy val nextGames: Set[TicTacToe] = Set(TicTacToe(moveHistory: Map[TMove, Player],
-  //                   nextPlayer: Player = PlayerA));
+  lazy val nextGames: Set[TicTacToe] = nextGames.+(TicTacToe(moveHistory: Map[TMove, Player]))
 
 
   def checkIfWon(moves:Set[TMove]):Boolean = {
-     val winBoard = List(List(TopLeft, TopCenter, TopRight),
-                         List(MiddleLeft, MiddleCenter, MiddleRight),
-                         List(BottomLeft, BottomCenter, BottomRight),
-                         List(TopLeft, MiddleLeft, BottomLeft),
-                         List(TopCenter, MiddleCenter, BottomCenter),
-                         List(TopRight, MiddleRight, BottomRight),
-                         List(TopLeft, MiddleCenter, BottomRight),
-                         List(TopRight, MiddleCenter, TopRight))
 
-     if(winBoard.exists(winSet => winSet.forall( moves.contains(_) ))) true
-     else  false
-   }
+
+    val a:Set[TMove] = Set(TopLeft, TopCenter, TopRight)
+    val b:Set[TMove] = Set(MiddleLeft, MiddleCenter, MiddleRight)
+    val c:Set[TMove] = Set(BottomLeft, BottomCenter, BottomRight)
+    val d:Set[TMove] = Set(TopLeft, MiddleLeft, BottomLeft)
+    val e:Set[TMove] = Set(TopCenter, MiddleCenter, BottomCenter)
+    val f:Set[TMove] = Set(TopRight, MiddleRight, BottomRight)
+    val g:Set[TMove] = Set(TopLeft, MiddleCenter, BottomRight)
+    val h:Set[TMove] = Set(TopRight, MiddleCenter, BottomLeft)
+
+
+    if(a.diff(moves).size == 0 || b.diff(moves).size == 0 || c.diff(moves).size == 0 ||
+      d.diff(moves).size == 0 || e.diff(moves).size == 0 || f.diff(moves).size == 0 ||
+      g.diff(moves).size == 0 || h.diff(moves).size == 0) {true } else {false}
+  }
 
 
   /**
@@ -273,12 +278,10 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     * The set of moves contains all moves which contributed to the result.
     */
   def winner: Option[(Player, Set[TMove])] = {
-    //filter value after the player and then only return the keys (executed moves) as a Set of [TMove]
-    //val movesPlayerB = moveHistory.filter(_ == PlayerA).map(_._1).toSet
+    val movesPlayerA = moveHistory.filter(_._2 == PlayerA).keySet
+    val movesPlayerB = moveHistory.filter(_._2 == PlayerB).keySet
 
-    val movesPlayerA = moveHistory.filter(_ == PlayerA).keySet
-    val movesPlayerB = moveHistory.filter(_ == PlayerB).keySet
-
+ 
     if (checkIfWon(movesPlayerA)) {
       Some(PlayerA, movesPlayerA)
     } else if (checkIfWon(movesPlayerB)) {

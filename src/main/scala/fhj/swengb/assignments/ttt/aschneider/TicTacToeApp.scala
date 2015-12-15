@@ -1,25 +1,18 @@
 package fhj.swengb.assignments.ttt.aschneider
 
-import javafx.application.Application
-import javafx.scene.shape.{CubicCurveTo, MoveTo, Path}
-import javafx.stage.Stage
-import java.awt.{TextField, Button}
-import java.beans.EventHandler
-import java.net.URL
-import java.rmi.activation.ActivationGroup_Stub
-import java.util.ResourceBundle
 import javafx.animation._
 import javafx.application.Application
-import javafx.fxml.{FXML, FXMLLoader, Initializable}
+import javafx.fxml.{FXML, FXMLLoader}
 import javafx.scene._
-import javafx.scene.control.Label
-import javafx.scene.image.{Image, ImageView}
-import javafx.scene.layout.{AnchorPane, GridPane, BorderPane}
+import javafx.scene.image.ImageView
+import javafx.scene.layout.AnchorPane
+import javafx.scene.shape.{CubicCurveTo, MoveTo, Path}
 import javafx.stage.Stage
 import javafx.util.Duration
-import com.sun.javaws.jnl.JavaFXAppDesc
-import com.sun.org.apache.xpath.internal.functions.FuncFalse
+
 import scala.util.control.NonFatal
+
+//import TicTacToe
 
 
 //case class highscore() {
@@ -94,10 +87,11 @@ class TicTacToeAppController extends TicTacToeApp {
   @FXML var bottomCentre: control.Button = _
   @FXML var bottomRight: control.Button = _
 
-
+  var mainGame:TicTacToe = _
   var playingInSpMode: Boolean = true
   //
-  var player1Playing: Boolean = false
+  var playerPlaying: Player = PlayerA
+  var  player1Playing:Boolean = true
 
   /*
   Positions:  0 | 1 | 2
@@ -182,36 +176,36 @@ class TicTacToeAppController extends TicTacToeApp {
 
 
 
-  def drawPlayGround(playerSymbol: Char, markedPos: Int): Unit = {
-    if (markedPos == 0) {
+  def drawPlayGround(playerSymbol: Char, markedPos: TMove): Unit = {
+    if (markedPos == TopLeft) {
       topLeft.setText(playerSymbol.toString)
       topLeft.setDisable(true)
     }
-    else if (markedPos == 1) {
+    else if (markedPos == TopCenter) {
       topCentre.setText(playerSymbol.toString)
       topCentre.setDisable(true)
     }
-    else if (markedPos == 2) {
+    else if (markedPos == TopRight) {
       topRight.setText(playerSymbol.toString)
       topRight.setDisable(true)
     }
-    else if (markedPos == 3) {
+    else if (markedPos == MiddleLeft) {
       centreLeft.setText(playerSymbol.toString)
       centreLeft.setDisable(true)
     }
-    else if (markedPos == 4) {
+    else if (markedPos == MiddleCenter) {
       centreCentre.setText(playerSymbol.toString)
       centreCentre.setDisable(true)
     }
-    else if (markedPos == 5) {
+    else if (markedPos == MiddleRight) {
       centreRight.setText(playerSymbol.toString)
       centreRight.setDisable(true)
     }
-    else if (markedPos == 6) {
+    else if (markedPos == BottomLeft) {
       bottomLeft.setText(playerSymbol.toString)
       bottomLeft.setDisable(true)
     }
-    else if (markedPos == 7) {
+    else if (markedPos == BottomCenter) {
       bottomCentre.setText(playerSymbol.toString)
       bottomCentre.setDisable(true)
     }
@@ -242,12 +236,43 @@ class TicTacToeAppController extends TicTacToeApp {
   }
 
 
+
+
   /*
       player: current playing player (is Player 1 playing?)
       gameMode: playing in Sp-Mode?
       markedPos: position played
       board: last state of the board
    */
+
+  def playGame(move: TMove, game:TicTacToe = mainGame):TicTacToe= {
+    val newGame:TicTacToe = game.turn(move,game.nextPlayer)
+    print(newGame.asString())
+
+    if (newGame.nextPlayer==PlayerA)
+      drawPlayGround('X', move)
+    else drawPlayGround('O', move)
+
+
+    if(newGame.gameOver){
+      if(newGame.winner.isDefined){
+        if(newGame.nextPlayer!=PlayerA)
+          winStatus.setText(mpName1.getCharacters.toString + " won the game in " + counter + " steps!")
+        else
+          winStatus.setText(mpName1.getCharacters.toString + " won the game in " + counter + " steps!")
+      }else winStatus.setText("There are no turns left!")
+
+      playground.setDisable(true)
+      anim(winPane, false, 370, 130)
+    }
+
+    if (newGame.nextPlayer!=PlayerA) status.setText("It's " + mpName1.getCharacters.toString + "'s (" + 'X' + ") turn:")
+    else status.setText("It's " + mpName2.getCharacters.toString + "'s (" + 'O' + ") turn:")
+
+    newGame
+  }
+
+/*
   def mainGame(player: Boolean, computerEnemy: Boolean, markedPos: Int, board: Array[Char]): Unit = {
 
     val symbol1 = 'X'
@@ -291,7 +316,7 @@ class TicTacToeAppController extends TicTacToeApp {
       player1Playing = !player
       counter += 1
     }
-  }
+  }*/
 
 
   def mpMenuBack(): Unit = anim(mpMenu, true)
@@ -299,63 +324,67 @@ class TicTacToeAppController extends TicTacToeApp {
   //Hier die richtigen User Infos übergeben! -> aus tabelle oda ka wie ihr sie gespeichert habts
   def spMenuBack(): Unit = anim(spMenu, true)
 
-  def mpStartMenu(): Unit = anim(mpMenu, false);
+  def mpStartMenu(): Unit = anim(mpMenu, false)
 
   def spStartMenu(): Unit = anim(spMenu, false)
 
   def mpStart(): Unit = {
-
-
-    playingInSpMode = false; player1Playing = startMultiPlayer(mpName1.getCharacters.toString, mpName2.getCharacters.toString)
+    startMultiPlayer(mpName1.getCharacters.toString, mpName2.getCharacters.toString)
+    mainGame = TicTacToe.apply()
   }
 
   def spStart(): Unit = {
-    playingInSpMode = true; player1Playing = startSinglePlayer(spName.getCharacters.toString)
+    player1Playing = startSinglePlayer(spName.getCharacters.toString)
+    mainGame = TicTacToe.apply()
   }
 
   def backToMainMenu(): Unit = ???
 
   def restart(): Unit = {
-    TicTacToe.apply()
-    //menu.getScene().getWindow().hide(); start(new Stage); counter = 0
+    mainGame = TicTacToe.apply()
+    menu.getScene().getWindow().hide(); start(new Stage)
   }
+
+
+
 
 
   def playTopLeft(): Unit = {
-    turn(TopLeft)
-    //mainGame(player1Playing, playingInSpMode, 0, board)
+    //TicTacToe.turn(TopLeft, PlayerA)
+    mainGame = playGame(TopLeft)
+
   }
 
   def playTopCentre(): Unit = {
-    mainGame(player1Playing, playingInSpMode, 1, board)
+    mainGame = playGame(TopCenter)
   }
 
   def playTopRight(): Unit = {
-    mainGame(player1Playing, playingInSpMode, 2, board)
+    mainGame = playGame(TopRight)
   }
 
   def playCentreLeft(): Unit = {
-    mainGame(player1Playing, playingInSpMode, 3, board)
+    mainGame = playGame(MiddleLeft)
   }
 
   def playCentreCentre(): Unit = {
-    mainGame(player1Playing, playingInSpMode, 4, board)
+    mainGame = playGame(MiddleCenter)
   }
 
   def playCentreRight(): Unit = {
-    mainGame(player1Playing, playingInSpMode, 5, board)
+    mainGame = playGame(MiddleRight)
   }
 
   def playBottomLeft(): Unit = {
-    mainGame(player1Playing, playingInSpMode, 6, board)
+    mainGame = playGame(BottomLeft)
   }
 
   def playBottomCentre(): Unit = {
-    mainGame(player1Playing, playingInSpMode, 7, board)
+    mainGame = playGame(BottomCenter)
   }
 
   def playBottomRight(): Unit = {
-    mainGame(player1Playing, playingInSpMode, 8, board)
+    mainGame = playGame(BottomRight)
   }
 
   def exit(): Unit = System.exit(1)
