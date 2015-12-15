@@ -18,7 +18,7 @@
     <children>
         <AnchorPane fx:id="menu" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="700.0" styleClass="root" stylesheets="@TicaTacToe.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <Label alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="8.0" layoutY="50.0" prefHeight="74.0" prefWidth="585.0" text="Tic Tac Joe" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                <Label alignment="TOP_CENTER" contentDisplay="CENTER" layoutX="8.0" layoutY="50.0" prefHeight="74.0" prefWidth="585.0" text="Tic Tac Toe" textAlignment="CENTER" textFill="WHITE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
                     <font>
                         <Font name="DejaVu Serif Bold" size="64.0" />
                     </font>

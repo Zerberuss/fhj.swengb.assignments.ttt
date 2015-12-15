@@ -88,38 +88,6 @@ object TicTacToe {
     }
     temp
   }
-/*
-  def play(t: TicTacToe, moves: Seq[TMove]): TicTacToe = {
-    var temp:TicTacToe = t
-    //determining the current player
-    var currentPlayer:Player = PlayerA //if the map is empty, the current player is the human player PlayerA
-    if (temp.moveHistory.nonEmpty){ //if the map is not empty, the currentPlayer is the player that did not make the last move
-      currentPlayer = temp.moveHistory.last._2 match {  //match the player of the last turn
-        case PlayerA => PlayerB
-        case PlayerB => PlayerA
-      }
-    }
-
-    //simulating the moves:  (besides turn, we can also check winning etc.)
-    for (move <- moves) {
-      temp = temp.turn(move, currentPlayer)
-
-      //if (currentPlayer == PlayerA) {
-      //  currentPlayer == PlayerB
-      //} else {
-      //  currentPlayer == PlayerA
-      //}
-
-      currentPlayer = currentPlayer match {
-        case PlayerB => PlayerA
-        case PlayerA => PlayerB
-      }
-    }
-
-    temp
-
-
-  }*/
 
 
   /**
@@ -224,19 +192,6 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
   }
 
-
-    /*
-  def returnCaseObject(index:Int):TMove = {
-    //allMoves.filter(_.idx == index).head
-    if (index >= 0 && index < allMoves.size) {
-      allMoves.find { _.idx == index }.get
-    } else {
-      //fucking default value: not beautiful, there should be an option that can return None for the else clause
-      TopCenter
-    }
-  }
-  */
-
   def returnCaseObject(index:Int):TMove = {
     allMoves.find(_.idx == index).get //find returns an option, so we get the value out of the option
   }
@@ -255,7 +210,6 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
   def checkIfWon(moves:Set[TMove]):Boolean = {
 
-
     val a:Set[TMove] = Set(TopLeft, TopCenter, TopRight)
     val b:Set[TMove] = Set(MiddleLeft, MiddleCenter, MiddleRight)
     val c:Set[TMove] = Set(BottomLeft, BottomCenter, BottomRight)
@@ -266,9 +220,9 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     val h:Set[TMove] = Set(TopRight, MiddleCenter, BottomLeft)
 
 
-    if(a.diff(moves).size == 0 || b.diff(moves).size == 0 || c.diff(moves).size == 0 ||
-      d.diff(moves).size == 0 || e.diff(moves).size == 0 || f.diff(moves).size == 0 ||
-      g.diff(moves).size == 0 || h.diff(moves).size == 0) {true } else {false}
+    if(a.diff(moves).isEmpty || b.diff(moves).isEmpty|| c.diff(moves).isEmpty ||
+      d.diff(moves).isEmpty || e.diff(moves).isEmpty || f.diff(moves).isEmpty ||
+      g.diff(moves).isEmpty || h.diff(moves).isEmpty) {true } else {false}
   }
 
 
@@ -281,7 +235,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     val movesPlayerA = moveHistory.filter(_._2 == PlayerA).keySet
     val movesPlayerB = moveHistory.filter(_._2 == PlayerB).keySet
 
- 
+
     if (checkIfWon(movesPlayerA)) {
       Some(PlayerA, movesPlayerA)
     } else if (checkIfWon(movesPlayerB)) {
@@ -337,13 +291,13 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
 
   //simple algorithm that returns the TMove that would cause a win for the enemy in the shortest time:
-  private def playSimulated():(TMove) = {
+  def playSimulated():(TMove) = {
     val moveScores = {
       for {
         move <- remainingMoves
       } yield move -> minimax()
     }
-    val bestMove = moveScores.minBy(_._2)._1  //first selecting the lowest value entry (Integer result for minimize and maximize) then returning the best move
+    val bestMove = moveScores.maxBy(_._2)._1  //first selecting the lowest value entry (Integer result for minimize and maximize) then returning the best move
     bestMove
   }
 
@@ -381,8 +335,8 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
 
   def winnerSimulate(moveHis:Map[TMove, Player]): Option[(Player, Set[TMove])] = {
-    val movesPlayerA = moveHis.filter(_ == PlayerA).keySet
-    val movesPlayerB = moveHis.filter(_ == PlayerB).keySet
+    val movesPlayerA = moveHis.filter(_._2 == PlayerA).keySet
+    val movesPlayerB = moveHis.filter(_._2 == PlayerB).keySet
     if (checkIfWon(movesPlayerA)) {
       Some(PlayerA, movesPlayerA)
     } else if (checkIfWon(movesPlayerB)) {
@@ -392,8 +346,8 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
   }
 
   def winnerScore(moveHis:Map[TMove, Player]): Int = {
-    val movesPlayerA = moveHis.filter(_ == PlayerA).keySet
-    val movesPlayerB = moveHis.filter(_ == PlayerB).keySet
+    val movesPlayerA = moveHis.filter(_._2 == PlayerA).keySet
+    val movesPlayerB = moveHis.filter(_._2 == PlayerB).keySet
     if (checkIfWon(movesPlayerA)) {
       1
     } else if (checkIfWon(movesPlayerB)) {
@@ -407,65 +361,62 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     * src: http://www3.ntu.edu.sg/home/ehchua/programming/java/javagame_tictactoe_ai.html
     */
   def evaluate(moveHis:Map[TMove, Player]):Int = {
-    val movesPlayerA = moveHis.filter(_ == PlayerA).keySet;  //executedMoves of Player A
-    val movesPlayerB = moveHis.filter(_ == PlayerB).keySet;  //executedMoves of Player B
+    val movesPlayerA = moveHis.filter(_._2 == PlayerA).keySet;  //executedMoves of Player A
+    val movesPlayerB = moveHis.filter(_._2 == PlayerB).keySet;  //executedMoves of Player B
 
-    var scoreG = 0;
+    var scoreG = 0
 
     def evaluateLine(field1Pos:Int, field2Pos:Int, field3Pos:Int):Int = {
-      var score = 0;
-      val cell1 = returnCaseObject(field1Pos);
-      val cell2 = returnCaseObject(field1Pos);
-      val cell3 = returnCaseObject(field1Pos);
+      var score = 0
+      val cell1 = returnCaseObject(field1Pos)
+      val cell2 = returnCaseObject(field1Pos)
+      val cell3 = returnCaseObject(field1Pos)
       // First cell
       if (movesPlayerA.contains(cell1)) {
         score = 1
       } else if (movesPlayerB.contains(cell1)) {
-        score = -1;
+        score = -1
       }
 
       // Second cell
       if (movesPlayerA.contains(cell2)) {
         if (score == 1) {   // cell1 is mySeed
-          score = 10;
+          score = 10
         } else if (score == -1) {  // cell1 is oppSeed
-          return 0;
+          return 0
         } else {  // cell1 is empty
-          score = 1;
+          score = 1
         }
       } else if (movesPlayerB.contains(cell2)) {
         if (score == -1) { // cell1 is oppSeed
-          score = -10;
+          score = -10
         } else if (score == 1) { // cell1 is mySeed
-          return 0;
+          return 0
         } else {  // cell1 is empty
-          score = -1;
+          score = -1
         }
       }
 
       // Third cell
       if (movesPlayerA.contains(cell3)) {
         if (score > 0) {  // cell1 and/or cell2 is mySeed
-          score *= 10;
+          score *= 10
         } else if (score < 0) {  // cell1 and/or cell2 is oppSeed
-          return 0;
+          return 0
         } else {  // cell1 and cell2 are empty
-          score = 1;
+          score = 1
         }
       } else if (movesPlayerB.contains(cell3)) {
         if (score < 0) {  // cell1 and/or cell2 is oppSeed
-          score *= 10;
+          score *= 10
         } else if (score > 1) {  // cell1 and/or cell2 is mySeed
-          return 0;
+          return 0
         } else {  // cell1 and cell2 are empty
-          score = -1;
+          score = -1
         }
       }
-
       score
-
     }
-
 
     scoreG += evaluateLine(0,1,2);  // row 0
     scoreG += evaluateLine(3,4,5);  // row 1

@@ -89,20 +89,9 @@ class TicTacToeAppController extends TicTacToeApp {
 
   var mainGame:TicTacToe = _
   var playingInSpMode: Boolean = true
-  //
-  var playerPlaying: Player = PlayerA
-  var  player1Playing:Boolean = true
+  var CPUplaying:Boolean = false
 
-  /*
-  Positions:  0 | 1 | 2
-              ---------
-              3 | 4 | 5
-              ---------
-              6 | 7 | 8
-   */
-
-  var board = new Array[Char](9)
-  var counter = 1;
+  var playerAPlaying:Boolean = true
 
 
   //initialize function executes the commands at startup for the main scene
@@ -133,8 +122,11 @@ class TicTacToeAppController extends TicTacToeApp {
 
   def startMultiPlayer(playerName1: String, playerName2: String): Boolean = {
 
+    playingInSpMode=false
+
     var player1IsStarting: Boolean = false
-    if (scala.util.Random.nextInt(100) >= 50) {
+    //if (scala.util.Random.nextInt(100) >= 50) {
+    if(false){
       player1IsStarting = true
       status.setText("It's " + playerName1 + "'s turn:")
     }
@@ -146,31 +138,32 @@ class TicTacToeAppController extends TicTacToeApp {
     anim(gamePane, false, 356)
 
     if (player1IsStarting)
-      return true
+       true
     else
-      return false
+       false
   }
 
 
 
   def startSinglePlayer(playerName: String): Boolean = {
 
+    playingInSpMode = true
+
     var playerIsStarting: Boolean = false
     if (scala.util.Random.nextInt(100) >= 50) {
       playerIsStarting = true
-      status.setText("It's " + playerName + "'s turn:")
     }
     else {
       playerIsStarting = false
-      status.setText("It's " + "computers" + "'s turn:")
     }
+    status.setText("Play against the bot:")
 
     anim(spMenu, true, 300)
     anim(gamePane, false, 356)
     if (playerIsStarting)
-      return true
+       true
     else
-      return false
+       false
   }
 
 
@@ -216,25 +209,6 @@ class TicTacToeAppController extends TicTacToeApp {
   }
 
 
-  def checkForWinner(board: Array[Char], symbol: Char): Boolean = {
-
-    val winBoard =
-      List(
-        List(0, 1, 2),
-        List(3, 4, 5),
-        List(6, 7, 8),
-        List(0, 3, 6),
-        List(1, 4, 7),
-        List(2, 5, 8),
-        List(0, 4, 8),
-        List(2, 4, 6))
-
-    print("\ncounter: " + counter) //== symbol)
-
-    return winBoard.exists(winSet => winSet.forall(board(_) == symbol))
-
-  }
-
 
 
 
@@ -245,78 +219,40 @@ class TicTacToeAppController extends TicTacToeApp {
       board: last state of the board
    */
 
-  def playGame(move: TMove, game:TicTacToe = mainGame):TicTacToe= {
-    val newGame:TicTacToe = game.turn(move,game.nextPlayer)
+  def playGame(move: TMove, game:TicTacToe = mainGame, BotIsPlaying:Boolean = false):TicTacToe= {
+    var newGame: TicTacToe = game.turn(move, game.nextPlayer)
     print(newGame.asString())
 
-    if (newGame.nextPlayer==PlayerA)
+    if (newGame.nextPlayer == PlayerA)
       drawPlayGround('X', move)
     else drawPlayGround('O', move)
 
 
-    if(newGame.gameOver){
-      if(newGame.winner.isDefined){
-        if(newGame.nextPlayer!=PlayerA)
-          winStatus.setText(mpName1.getCharacters.toString + " won the game in " + counter + " steps!")
+    if (newGame.gameOver) {
+      if (newGame.winner.isDefined) {
+        if (newGame.nextPlayer != PlayerA)
+          winStatus.setText(mpName1.getCharacters.toString + " won the game in " + newGame.moveHistory.size + " steps!")
         else
-          winStatus.setText(mpName1.getCharacters.toString + " won the game in " + counter + " steps!")
-      }else winStatus.setText("There are no turns left!")
+          winStatus.setText(mpName1.getCharacters.toString + " won the game in " + newGame.moveHistory.size + " steps!")
+      } else winStatus.setText("There are no turns left!")
 
       playground.setDisable(true)
       anim(winPane, false, 370, 130)
     }
+    else {
 
-    if (newGame.nextPlayer!=PlayerA) status.setText("It's " + mpName1.getCharacters.toString + "'s (" + 'X' + ") turn:")
-    else status.setText("It's " + mpName2.getCharacters.toString + "'s (" + 'O' + ") turn:")
+      if (playingInSpMode) {
+        if (!BotIsPlaying) {
+          newGame = playGame(newGame.playSimulated(), newGame, true)
+        }
+      }else {
+        if (newGame.nextPlayer != PlayerA) status.setText("It's " + mpName1.getCharacters.toString + "'s (" + 'X' + ") turn:")
+        else status.setText("It's " + mpName2.getCharacters.toString + "'s (" + 'O' + ") turn:")
+      }
+    }
 
     newGame
   }
-
-/*
-  def mainGame(player: Boolean, computerEnemy: Boolean, markedPos: Int, board: Array[Char]): Unit = {
-
-    val symbol1 = 'X'
-    val symbol2 = 'O'
-    var symbol = '?'
-    if (player) symbol = symbol1
-    else symbol = symbol2
-
-    board(markedPos) = symbol
-
-    status.setText("Drawing...")
-    drawPlayGround(symbol, markedPos)
-
-    if (checkForWinner(board, symbol)) {
-      print("WE HAVE A WINNER\n")
-
-      if (player) winStatus.setText(mpName1.getCharacters.toString + " won the game in " + counter + " steps!")
-      else winStatus.setText(mpName2.getCharacters.toString + " won the game in " + counter + " steps!")
-
-      playground.setDisable(true)
-      anim(winPane, false, 370, 130)
-
-    }
-
-
-    if (computerEnemy) {
-      status.setText("Computer is thinking...")
-      if (symbol == symbol1) symbol = symbol2 else symbol = symbol2
-      /*do{
-
-      }while(board())*/
-      //drawPlayGround(symbol,markedPos)
-
-
-    }
-    else {
-      if (!player) status.setText("It's " + mpName1.getCharacters.toString + "'s (" + symbol1 + ") turn:")
-      else status.setText("It's " + mpName2.getCharacters.toString + "'s (" + symbol2 + ") turn:")
-
-
-      player1Playing = !player
-      counter += 1
-    }
-  }*/
 
 
   def mpMenuBack(): Unit = anim(mpMenu, true)
@@ -334,8 +270,8 @@ class TicTacToeAppController extends TicTacToeApp {
   }
 
   def spStart(): Unit = {
-    player1Playing = startSinglePlayer(spName.getCharacters.toString)
     mainGame = TicTacToe.apply()
+    playerAPlaying = startSinglePlayer(spName.getCharacters.toString)
   }
 
   def backToMainMenu(): Unit = ???
