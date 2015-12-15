@@ -157,6 +157,8 @@ class TicTacToeAppController extends TicTacToeApp {
       playerIsStarting = false
     }
     status.setText("Play against the bot:")
+    mpName1.setText(spName.getText())
+    mpName2.setText("Angry Bot")
 
     anim(spMenu, true, 300)
     anim(gamePane, false, 356)
@@ -230,10 +232,10 @@ class TicTacToeAppController extends TicTacToeApp {
 
     if (newGame.gameOver) {
       if (newGame.winner.isDefined) {
-        if (newGame.nextPlayer != PlayerA)
-          winStatus.setText(mpName1.getCharacters.toString + " won the game in " + newGame.moveHistory.size + " steps!")
+        if (newGame.nextPlayer == PlayerA)
+          winStatus.setText(mpName2.getCharacters.toString + " won in " + newGame.moveHistory.size + " steps!")
         else
-          winStatus.setText(mpName1.getCharacters.toString + " won the game in " + newGame.moveHistory.size + " steps!")
+          winStatus.setText(mpName1.getCharacters.toString + " won in " + newGame.moveHistory.size + " steps!")
       } else winStatus.setText("There are no turns left!")
 
       playground.setDisable(true)
@@ -243,7 +245,7 @@ class TicTacToeAppController extends TicTacToeApp {
 
       if (playingInSpMode) {
         if (!BotIsPlaying) {
-          newGame = playGame(newGame.playSimulated(), newGame, true)
+          newGame = playGame(newGame.makeMove(), newGame, true)
         }
       }else {
         if (newGame.nextPlayer != PlayerA) status.setText("It's " + mpName1.getCharacters.toString + "'s (" + 'X' + ") turn:")
