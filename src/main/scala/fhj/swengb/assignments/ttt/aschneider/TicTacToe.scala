@@ -213,16 +213,16 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     val topRow:Set[TMove] = Set(TopLeft, TopCenter, TopRight)
     val centerRow:Set[TMove] = Set(MiddleLeft, MiddleCenter, MiddleRight)
     val bottomRow:Set[TMove] = Set(BottomLeft, BottomCenter, BottomRight)
-    val leftColoumn:Set[TMove] = Set(TopLeft, MiddleLeft, BottomLeft)
-    val middleColoumn:Set[TMove] = Set(TopCenter, MiddleCenter, BottomCenter)
+    val leftColumn:Set[TMove] = Set(TopLeft, MiddleLeft, BottomLeft)
+    val middleColumn:Set[TMove] = Set(TopCenter, MiddleCenter, BottomCenter)
     val rightColumn:Set[TMove] = Set(TopRight, MiddleRight, BottomRight)
-    val diagonalLeftToRoght:Set[TMove] = Set(TopLeft, MiddleCenter, BottomRight)
+    val diagonalLeftToRight:Set[TMove] = Set(TopLeft, MiddleCenter, BottomRight)
     val diagonalRightToLeft:Set[TMove] = Set(TopRight, MiddleCenter, BottomLeft)
 
 
     if(topRow.diff(moves).isEmpty || centerRow.diff(moves).isEmpty|| bottomRow.diff(moves).isEmpty ||
-      leftColoumn.diff(moves).isEmpty || middleColoumn.diff(moves).isEmpty || rightColumn.diff(moves).isEmpty ||
-      diagonalLeftToRoght.diff(moves).isEmpty || diagonalRightToLeft.diff(moves).isEmpty) {
+      leftColumn.diff(moves).isEmpty || middleColumn.diff(moves).isEmpty || rightColumn.diff(moves).isEmpty ||
+      diagonalLeftToRight.diff(moves).isEmpty || diagonalRightToLeft.diff(moves).isEmpty) {
       true
     } else {
       false
