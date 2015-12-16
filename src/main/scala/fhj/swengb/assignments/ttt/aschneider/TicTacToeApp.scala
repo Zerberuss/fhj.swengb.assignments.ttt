@@ -12,15 +12,7 @@ import javafx.util.Duration
 
 import scala.util.control.NonFatal
 
-//import TicTacToe
 
-
-//case class highscore() {
-//  val iwas : String
-//}
-
-
-//object launches the class described beneath
 object TicTacToeApp {
   def main(args: Array[String]) {
     Application.launch(classOf[TicTacToeApp], args: _*)
@@ -44,7 +36,6 @@ class TicTacToeApp extends javafx.application.Application {
       val scene = new Scene(loader.getRoot[Parent]) //loads the default scene
       stage.setScene(scene)
       stage.setResizable(false) //window cannot be rescaled
-      //stage.getScene.getStylesheets.add(Css)
       stage.show()
     } catch {
       case NonFatal(e) => e.printStackTrace()
@@ -63,7 +54,7 @@ class TicTacToeAppController extends TicTacToeApp {
   @FXML var gamePane: AnchorPane = _
   //game Pane where the game is played (both mp and sp)
   @FXML var mpAvatar: ImageView = _
-  //
+
   @FXML var spAvatar: ImageView = _
 
   @FXML var mpName1: control.TextField = _
@@ -125,7 +116,6 @@ class TicTacToeAppController extends TicTacToeApp {
     playingInSpMode=false
 
     var player1IsStarting: Boolean = false
-    //if (scala.util.Random.nextInt(100) >= 50) {
     if(false){
       player1IsStarting = true
       status.setText("It's " + playerName1 + "'s turn:")
@@ -212,15 +202,6 @@ class TicTacToeAppController extends TicTacToeApp {
 
 
 
-
-
-  /*
-      player: current playing player (is Player 1 playing?)
-      gameMode: playing in Sp-Mode?
-      markedPos: position played
-      board: last state of the board
-   */
-
   def playGame(move: TMove, game:TicTacToe = mainGame, BotIsPlaying:Boolean = false):TicTacToe= {
     var newGame: TicTacToe = game.turn(move, game.nextPlayer)
     print(newGame.asString())
@@ -285,10 +266,7 @@ class TicTacToeAppController extends TicTacToeApp {
 
 
 
-
-
   def playTopLeft(): Unit = {
-    //TicTacToe.turn(TopLeft, PlayerA)
     mainGame = playGame(TopLeft)
 
   }
@@ -326,5 +304,4 @@ class TicTacToeAppController extends TicTacToeApp {
   }
 
   def exit(): Unit = System.exit(1)
-
 }

@@ -210,19 +210,19 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
   def checkIfWon(moves:Set[TMove]):Boolean = {
 
-    val a:Set[TMove] = Set(TopLeft, TopCenter, TopRight)
-    val b:Set[TMove] = Set(MiddleLeft, MiddleCenter, MiddleRight)
-    val c:Set[TMove] = Set(BottomLeft, BottomCenter, BottomRight)
-    val d:Set[TMove] = Set(TopLeft, MiddleLeft, BottomLeft)
-    val e:Set[TMove] = Set(TopCenter, MiddleCenter, BottomCenter)
-    val f:Set[TMove] = Set(TopRight, MiddleRight, BottomRight)
-    val g:Set[TMove] = Set(TopLeft, MiddleCenter, BottomRight)
-    val h:Set[TMove] = Set(TopRight, MiddleCenter, BottomLeft)
+    val topRow:Set[TMove] = Set(TopLeft, TopCenter, TopRight)
+    val centerRow:Set[TMove] = Set(MiddleLeft, MiddleCenter, MiddleRight)
+    val bottomRow:Set[TMove] = Set(BottomLeft, BottomCenter, BottomRight)
+    val leftColoumn:Set[TMove] = Set(TopLeft, MiddleLeft, BottomLeft)
+    val middleColoumn:Set[TMove] = Set(TopCenter, MiddleCenter, BottomCenter)
+    val rightColumn:Set[TMove] = Set(TopRight, MiddleRight, BottomRight)
+    val diagonalLeftToRoght:Set[TMove] = Set(TopLeft, MiddleCenter, BottomRight)
+    val diagonalRightToLeft:Set[TMove] = Set(TopRight, MiddleCenter, BottomLeft)
 
 
-    if(a.diff(moves).isEmpty || b.diff(moves).isEmpty|| c.diff(moves).isEmpty ||
-      d.diff(moves).isEmpty || e.diff(moves).isEmpty || f.diff(moves).isEmpty ||
-      g.diff(moves).isEmpty || h.diff(moves).isEmpty) {
+    if(topRow.diff(moves).isEmpty || centerRow.diff(moves).isEmpty|| bottomRow.diff(moves).isEmpty ||
+      leftColoumn.diff(moves).isEmpty || middleColoumn.diff(moves).isEmpty || rightColumn.diff(moves).isEmpty ||
+      diagonalLeftToRoght.diff(moves).isEmpty || diagonalRightToLeft.diff(moves).isEmpty) {
       true
     } else {
       false
@@ -285,12 +285,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     */
 
   def remainingMovesSimulated(executedMoves: Map[TMove, Player]): Set[TMove] = {
-    //val allMoves = Seq[TMove](TopLeft, TopCenter,  TopRight, MiddleCenter, MiddleLeft, MiddleRight, BottomCenter,BottomLeft,BottomRight)
-    //allMoves.filter(!madeMoves.contains(_)).toSet
     (allMoves filterNot executedMoves.keySet.contains).toSet
-    //allMoves.diff(madeMoves).toSet
-
-
   }
 
 
@@ -305,7 +300,6 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     }
 
     minimax3(moveHistory,currentPlayer,nextPlayer,9,Integer.MIN_VALUE, Integer.MAX_VALUE)._1;
-
   }
 
 
@@ -318,43 +312,35 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     var betaNew = beta
     //var bestScore:Int = if(player == enemyPlayer) {Integer.MIN_VALUE} else {Integer.MAX_VALUE}
     // mySeed is maximizing; while oppSeed is minimizing
-    var currentScore:Int = 0;
-    var bestMove:TMove = MiddleCenter;
-    //int bestRow = -1;
-    //int bestCol = -1;
+    var currentScore:Int = 0
+    var bestMove:TMove = MiddleCenter
 
     if(winnerSimulate(moveHistorySimulated).isDefined || nextMoves.isEmpty || depth == 0) {
       // Gameover or depth reached, evaluate score
-      //bestScore = evaluate(moveHistorySimulated, player, nextPlayer)
       currentScore = evaluate(moveHistorySimulated, enemyPlayer, humanPlayer)
     } else {
 
       for (move <- nextMoves) {
-        //for (move <- nextMoves; if (alphaNew < betaNew)) {
         if (alphaNew < betaNew) {
           // Try this move for the current "player"
-          //cells[move[0]][move[1]].content = player;
           if (player == enemyPlayer) {  // mySeed (computer) is maximizing player
             currentScore = minimax3(moveHistorySimulated + (move -> player),humanPlayer, enemyPlayer, depth - 1, alphaNew, betaNew)._2;
             if (currentScore > alphaNew) {
-              alphaNew = currentScore;
-              bestMove = move;
+              alphaNew = currentScore
+              bestMove = move
             }
           } else {  // oppSeed is minimizing player
             currentScore = minimax3(moveHistorySimulated + (move -> player),enemyPlayer, humanPlayer, depth - 1, alphaNew, betaNew)._2;
             if (currentScore < betaNew) {
-              betaNew = currentScore;
-              bestMove = move;
+              betaNew = currentScore
+              bestMove = move
             }
           }
 
         }
       }
-      // Undo move
-      //cells[move[0]][move[1]].content = Seed.EMPTY;
-
     }
-    new Tuple2[TMove, Int](bestMove, currentScore);
+    new Tuple2[TMove, Int](bestMove, currentScore)
   }
 
   //simple algorithm that returns the TMove that would cause a win for the enemy in the shortest time:
@@ -379,7 +365,6 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
     def minimize(moveHistorySimulated:Map[TMove, Player], depth:Int, alpha:Int, beta:Int):Int = {
       val remainingMovesCurrent = remainingMovesSimulated(moveHistorySimulated)
-      //if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty || depth == 0) return evaluate(moveHistorySimulated, curPlayer, nexPlayer)
       if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty || depth == 0) return evaluate(moveHistorySimulated, enemyPlayer, humanPlayer)
 
       var newBeta = beta
@@ -392,7 +377,6 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
     def maximize(moveHistorySimulated:Map[TMove, Player], depth:Int, alpha:Int, beta:Int):Int = {
       val remainingMovesCurrent = remainingMovesSimulated(moveHistorySimulated)
-      //if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty || depth == 0) return evaluate(moveHistorySimulated, curPlayer, nexPlayer)
       if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty || depth == 0) return evaluate(moveHistorySimulated, enemyPlayer, humanPlayer)
 
       var newAlpha = alpha
@@ -408,56 +392,34 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
 
 
-
   private def minimax(curPlayer: Player, nexPlayer: Player):Int = {
-    val maxDepth = 3;
-    //val moveHis:Map[TMove, Player] = moveHistory;
-    //minimize(moveHistory,maxDepth) //maxDepth limitation is not necessary here because we have 9 turns at max. so in terms of performance this should not be a problem
-    //private def minimize(moveHistorySimulated:Map[TMove, Player],depth:Int):Int = {
-    def minimize(moveHistorySimulated:Map[TMove, Player], depth:Int):Int = {
+    val maxDepth = 3
+     def minimize(moveHistorySimulated:Map[TMove, Player], depth:Int):Int = {
       val remainingMovesCurrent = remainingMovesSimulated(moveHistorySimulated)
-      //if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty || depth == 0) return evaluate(moveHistorySimulated, curPlayer, nexPlayer)
-      if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty || depth == 0) return evaluate(moveHistorySimulated, enemyPlayer, humanPlayer)
+       if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty || depth == 0) return evaluate(moveHistorySimulated, enemyPlayer, humanPlayer)
       var bestResult = Integer.MAX_VALUE
       for (move <- remainingMovesCurrent) {
         val bestChildResult = maximize(turnSimulated(moveHistorySimulated,move,curPlayer), depth - 1)  //check what player should be maximized and what minimized
         bestResult = math.min(bestResult, bestChildResult)
       }
-      /*
-      remainingMovesCurrent.foreach(move => {
-        val bestChildResult = maximize(turnSimulated(moveHistorySimulated,move,curPlayer), depth - 1)  //check what player should be maximized and what minimized
-        bestResult = math.min(bestResult, bestChildResult)
-      })
-      */
-      bestResult
+        bestResult
     }
 
-    //private def maximize(moveHistorySimulated:Map[TMove, Player],depth:Int):Int = {
-    def maximize(moveHistorySimulated:Map[TMove, Player], depth:Int):Int = {
+   def maximize(moveHistorySimulated:Map[TMove, Player], depth:Int):Int = {
       val remainingMovesCurrent = remainingMovesSimulated(moveHistorySimulated)
-      //if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty || depth == 0) return evaluate(moveHistorySimulated, curPlayer, nexPlayer)
-      if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty || depth == 0) return evaluate(moveHistorySimulated, enemyPlayer, humanPlayer)
+    if(winnerSimulate(moveHistorySimulated).isDefined || remainingMovesCurrent.isEmpty || depth == 0) return evaluate(moveHistorySimulated, enemyPlayer, humanPlayer)
       var bestResult = Integer.MIN_VALUE
       for (move <- remainingMovesCurrent) {
         val bestChildResult = minimize(turnSimulated(moveHistorySimulated,move,nexPlayer), depth - 1)
         bestResult = math.max(bestResult, bestChildResult)
       }
-      /*
-      remainingMovesCurrent.foreach(move => {
-        val bestChildResult = minimize(turnSimulated(moveHistorySimulated,move,nexPlayer), depth - 1)
-        bestResult = math.max(bestResult, bestChildResult)
-      })
-      */
+
       bestResult
     }
 
 
     minimize(moveHistory, maxDepth)
   }
-
-
-
-
 
 
   def winnerSimulate(moveHis:Map[TMove, Player]): Option[(Player, Set[TMove])] = {
@@ -556,10 +518,8 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     scoreG += evaluateLine(2,5,8);  // col 3
     scoreG += evaluateLine(0,4,8);  // diagonal
     scoreG += evaluateLine(2,4,6);  // alternate diagonal
-    scoreG;
+    scoreG
   }
-
-
 
 
   def turnSimulated(moveHis:Map[TMove, Player], p: TMove, player: Player):Map[TMove, Player] = {
