@@ -141,7 +141,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
 
   def asString(): String = {
     var board: String =
-      "|---|---|---|\n" +
+        "|---|---|---|\n" +
         "|   |   |   |\n" +
         "|---|---|---|\n" +
         "|   |   |   |\n" +
@@ -174,7 +174,7 @@ case class TicTacToe(moveHistory: Map[TMove, Player],
     * The game is over if either of a player wins or there is a draw.
     */
   val gameOver: Boolean = {
-    if (moveHistory.size >= 9 || winner!=None) {
+    if (moveHistory.size >= 9 || winner.isDefined) {
       true
     } else {
       false
